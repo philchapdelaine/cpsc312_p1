@@ -4,6 +4,8 @@ About Haskell implementation of Conway's Game of Life
 Game of Probable Life
 Authors: Emily, Philippe, and Phoebe
 
+To run, type `ghc life` into your terminal and then `./life`
+
 What is the problem?
 We will use Haskell to implement a simulation of Conway's Game of Life.
 
