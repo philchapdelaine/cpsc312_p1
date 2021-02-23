@@ -65,6 +65,12 @@ neighbours (Cell _ position) board =
 nextCellGeneration :: Cell -> [Cell] -> Cell
 nextCellGeneration cell cells = Cell Dead (0,0) -- stub
 
+-- returns True if cell is Alive
+isAlive :: Cell -> Bool
+isAlive (Cell state _)
+    | state == Alive = True
+    | otherwise = False
+
 
 -- returns true if all cells on the board are dead, else false
 allDead :: Board -> Bool
