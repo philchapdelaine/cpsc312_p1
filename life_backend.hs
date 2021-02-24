@@ -84,6 +84,34 @@ count p (h:t) = if p h then 1 + count p t else count p t
 --       stillDead c nb = if count (==True) (map isAlive nb) == 3 then (Cell Alive position) else (Cell Dead position)
 
 
+-- Generates the next cell state given the cell, its neighbours and a probability (0-100)
+-- A cell with 2 or 3 live neighbours survives
+-- A dead cell with 3 live neighbours becomes live
+-- All other cells become dead. Dead cells stay dead
+nextCellGenP :: Cell -> [Cell] -> Int -> IO Cell
+nextCellGenP (Cell state position) nb prob = if state == Alive then stillAlive (Cell Alive position) nb prob else stillDead (Cell Dead position) nb prob
+
+-- Determines if a living cell remains alive 
+-- A cell with 2 or 3 living neighbours remains alive, otherwise the cell dies with the given probability
+stillAlive :: Cell -> [Cell] -> Int -> IO Cell
+stillAlive (Cell state position) nb prob = if count (==True) (map isAlive nb) `elem` [2,3] then return (Cell Alive position) else switch (Cell Alive position) prob
+
+-- Determines if a dead cell remains dead
+-- A cell with 3 living neighbours becomes alive with given probability, otherwise the cell remains dead
+stillDead :: Cell -> [Cell] -> Int -> IO Cell
+stillDead (Cell state position) nb prob = if count (==True) (map isAlive nb) == 3 then switch (Cell Dead position) prob else return (Cell Dead position)
+
+-- Based on the probability given, the cell changes state. Otherwise the cell remains the same
+switch :: Cell -> Int -> IO Cell
+switch (Cell state position) prob = do
+    a <- pick prob
+    if (state == Alive && a == 1) || (state == Dead && a == 0) then return (Cell Dead position)
+    else return (Cell Alive position)
+
+-- Given a probability, p (1-100), generates a list with p 1's and (100-p) 0's and chooses a value at random 
+pick :: Num b => Int -> IO b
+pick p = (\index -> (replicate p 1 ++ (replicate (100-p) 0)) !! index) <$> randomRIO (0,99)
+
 --tests
 --c1 = Cell Alive (0,1)
 --c2 = Cell Alive (1,0)
@@ -95,22 +123,6 @@ count p (h:t) = if p h then 1 + count p t else count p t
 --nb = neighbours c3 board
 --neigh = neighbours c6 board
 
-
-nextCell (Cell state position) prob = do
-    a <- pick prob
-    if a == 1 then if state == Alive then return (Cell Dead position) else return (Cell Alive position) else return (Cell Alive position)
-
-nextCellGenP (Cell state position) nb prob = if state == Alive then stillAlive (Cell Alive position) nb prob else stillDead (Cell Dead position) nb prob
-
-
-stillAlive (Cell state position) nb prob = if count (==True) (map isAlive nb) `elem` [2,3] then nextCell (Cell Alive position) prob else nextCell (Cell Dead position) prob
-
-stillDead (Cell state position) nb prob = if count (==True) (map isAlive nb) == 3 then nextCell (Cell Alive position) prob else nextCell (Cell Dead position) prob
-
--- Given a probability, p (1-100), generates a list with p 1's and (100-p) 0's and chooses a value at random 
-pick :: Num b => Int -> IO b
-pick p = (\index -> (replicate p 1 ++ (replicate (100-p) 0)) !! index) <$> randomRIO (0,99)
-    
 
 -- returns true if all cells on the board are dead, else false
 allDead :: Board -> Bool
@@ -128,12 +140,12 @@ allDead board = all (==Dead) [state | (Cell state position) <- board]
 
 -- if all dead then return EndOfGame
 -- if not then calculate the next board and return it as part of ContinueGame
-gameOfLife :: Board -> Result
-gameOfLife board
-    | allDead nextBoard = EndOfGame nextBoard
-    | otherwise = ContinueGame nextBoard
-    where
-        nextBoard = [nextCellGenP cell (neighbours cell board) prob| cell <- board]
+--gameOfLife :: Board -> Result
+--gameOfLife board
+--    | allDead nextBoard = EndOfGame nextBoard
+--    | otherwise = ContinueGame nextBoard
+--    where
+--        nextBoard = [nextCellGenP cell (neighbours cell board) prob| cell <- board]
 
 
 -- !!TODO!!
