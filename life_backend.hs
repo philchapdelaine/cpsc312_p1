@@ -59,17 +59,29 @@ neighbours (Cell _ position) board =
 -- let cell2 = Cell Alive (3,4)
 -- let board = [cell1, cell2]
 -- neighbours cell1 board
-    
-    
--- !!TODO!!: given a cell and it's neighbours (and a probability?), return the cell in the next generation
-nextCellGeneration :: Cell -> [Cell] -> Cell
-nextCellGeneration cell cells = Cell Dead (0,0) -- stub
-
 -- returns True if cell is Alive
 isAlive :: Cell -> Bool
 isAlive (Cell state _)
     | state == Alive = True
     | otherwise = False
+
+-- counts the number of occurances in the list that matches parameter p 
+count :: Num p => (t -> Bool) -> [t] -> p
+count p [] = 0
+count p (h:t) = if p h then 1 + count p t else count p t
+    
+-- !!TODO!!: given a cell and it's neighbours (and a probability?), return the cell in the next generation
+-- A cell with 2 or 3 live neighbours survives
+-- A dead cell with 3 live neighbours becomes live
+-- All other cells become dead. Dead cells stay dead
+nextCellGeneration :: Cell -> [Cell] -> Cell
+nextCellGeneration (Cell state position) nb = if state == Alive then stillAlive (Cell Alive position) nb else stillDead (Cell Dead position) nb
+
+stillAlive:: Cell -> [Cell] -> Cell 
+stillAlive (Cell Alive p) nb = if (count (==True) (map isAlive nb)) `elem` [2,3] then (Cell Alive p) else (Cell Dead p)
+
+stillDead :: Cell -> [Cell] -> Cell
+stillDead (Cell Dead p) nb = if (count (==True) (map isAlive nb)) == 3 then (Cell Alive p) else (Cell Dead p)
 
 
 -- returns true if all cells on the board are dead, else false
