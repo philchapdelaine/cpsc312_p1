@@ -76,13 +76,26 @@ count p (h:t) = if p h then 1 + count p t else count p t
 -- All other cells become dead. Dead cells stay dead
 nextCellGeneration :: Cell -> [Cell] -> Cell
 nextCellGeneration (Cell state position) nb = if state == Alive then stillAlive (Cell Alive position) nb else stillDead (Cell Dead position) nb
+   where 
+       stillAlive c nb = if count (==True) (map isAlive nb) `elem` [2,3] then (Cell Alive position) else (Cell Dead position)
+       stillDead c nb = if count (==True) (map isAlive nb) == 3 then (Cell Alive position) else (Cell Dead position)
 
-stillAlive:: Cell -> [Cell] -> Cell 
-stillAlive (Cell Alive p) nb = if (count (==True) (map isAlive nb)) `elem` [2,3] then (Cell Alive p) else (Cell Dead p)
+--stillAlive:: Cell -> [Cell] -> Cell 
+--stillAlive (Cell Alive p) nb = if (count (==True) (map isAlive nb)) `elem` [2,3] then (Cell Alive p) else (Cell Dead p)
 
-stillDead :: Cell -> [Cell] -> Cell
-stillDead (Cell Dead p) nb = if (count (==True) (map isAlive nb)) == 3 then (Cell Alive p) else (Cell Dead p)
+--stillDead :: Cell -> [Cell] -> Cell
+--stillDead (Cell Dead p) nb = if (count (==True) (map isAlive nb)) == 3 then (Cell Alive p) else (Cell Dead p)
 
+--tests
+--c1 = Cell Alive (0,1)
+--c2 = Cell Alive (1,0)
+--c3 = Cell Alive (1,1)
+--c4 = Cell Alive (1,2)
+--c5 = Cell Alive (2,1)
+--c6 = Cell Dead (2,2)
+--board = [c1,c2,c3,c4,c5,c6]
+--nb = neighbours c3 board
+--neigh = neighbours c6 board
 
 -- returns true if all cells on the board are dead, else false
 allDead :: Board -> Bool
