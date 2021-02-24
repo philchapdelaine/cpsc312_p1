@@ -61,6 +61,7 @@ neighbours (Cell _ position) board =
 -- let cell2 = Cell Alive (3,4)
 -- let board = [cell1, cell2]
 -- neighbours cell1 board
+
 -- returns True if cell is Alive
 isAlive :: Cell -> Bool
 isAlive (Cell state _)
@@ -76,17 +77,12 @@ count p (h:t) = if p h then 1 + count p t else count p t
 -- A cell with 2 or 3 live neighbours survives
 -- A dead cell with 3 live neighbours becomes live
 -- All other cells become dead. Dead cells stay dead
-nextCellGeneration :: Cell -> [Cell] -> Cell
-nextCellGeneration (Cell state position) nb = if state == Alive then stillAlive (Cell Alive position) nb else stillDead (Cell Dead position) nb
-   where 
-       stillAlive c nb = if count (==True) (map isAlive nb) `elem` [2,3] then (Cell Alive position) else (Cell Dead position)
-       stillDead c nb = if count (==True) (map isAlive nb) == 3 then (Cell Alive position) else (Cell Dead position)
+--nextCellGeneration :: Cell -> [Cell] -> Cell
+--nextCellGeneration (Cell state position) nb = if state == Alive then stillAlive (Cell Alive position) nb else stillDead (Cell Dead position) nb
+--   where 
+--       stillAlive c nb = if count (==True) (map isAlive nb) `elem` [2,3] then (Cell Alive position) else (Cell Dead position)
+--       stillDead c nb = if count (==True) (map isAlive nb) == 3 then (Cell Alive position) else (Cell Dead position)
 
---stillAlive:: Cell -> [Cell] -> Cell 
---stillAlive (Cell Alive p) nb = if (count (==True) (map isAlive nb)) `elem` [2,3] then (Cell Alive p) else (Cell Dead p)
-
---stillDead :: Cell -> [Cell] -> Cell
---stillDead (Cell Dead p) nb = if (count (==True) (map isAlive nb)) == 3 then (Cell Alive p) else (Cell Dead p)
 
 --tests
 --c1 = Cell Alive (0,1)
@@ -100,7 +96,19 @@ nextCellGeneration (Cell state position) nb = if state == Alive then stillAlive 
 --neigh = neighbours c6 board
 
 
+nextCell (Cell state position) prob = do
+    a <- pick prob
+    if a == 1 then if state == Alive then return (Cell Dead position) else return (Cell Alive position) else return (Cell Alive position)
+
+nextCellGenP (Cell state position) nb prob = if state == Alive then stillAlive (Cell Alive position) nb prob else stillDead (Cell Dead position) nb prob
+
+
+stillAlive (Cell state position) nb prob = if count (==True) (map isAlive nb) `elem` [2,3] then nextCell (Cell Alive position) prob else nextCell (Cell Dead position) prob
+
+stillDead (Cell state position) nb prob = if count (==True) (map isAlive nb) == 3 then nextCell (Cell Alive position) prob else nextCell (Cell Dead position) prob
+
 -- Given a probability, p (1-100), generates a list with p 1's and (100-p) 0's and chooses a value at random 
+pick :: Num b => Int -> IO b
 pick p = (\index -> (replicate p 1 ++ (replicate (100-p) 0)) !! index) <$> randomRIO (0,99)
     
 
@@ -125,7 +133,7 @@ gameOfLife board
     | allDead nextBoard = EndOfGame nextBoard
     | otherwise = ContinueGame nextBoard
     where
-        nextBoard = [nextCellGeneration cell (neighbours cell board) | cell <- board]
+        nextBoard = [nextCellGenP cell (neighbours cell board) prob| cell <- board]
 
 
 -- !!TODO!!
