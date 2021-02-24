@@ -1,5 +1,7 @@
 module Life_backend where
 
+import System.Random
+
 -- currently I worry we might have a problem where the Board will get too big
 -- some solutions could be: - have a set width and height of the board - not a huge fan since the board should be infinite in the game of life
 --                          - we trim it when an area is all "dead" - I like this one more and we can probably implement it later rather than sooner
@@ -96,6 +98,11 @@ nextCellGeneration (Cell state position) nb = if state == Alive then stillAlive 
 --board = [c1,c2,c3,c4,c5,c6]
 --nb = neighbours c3 board
 --neigh = neighbours c6 board
+
+
+-- Given a probability, p (1-100), generates a list with p 1's and (100-p) 0's and chooses a value at random 
+pick p = (\index -> (replicate p 1 ++ (replicate (100-p) 0)) !! index) <$> randomRIO (0,99)
+    
 
 -- returns true if all cells on the board are dead, else false
 allDead :: Board -> Bool
