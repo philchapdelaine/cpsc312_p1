@@ -124,8 +124,8 @@ pick p index = (replicate p 1 ++ (replicate (100-p) 0)) !! index
 --neigh = neighbours c6 board
 
 -- Generates next board 
-nextBoardGen:: Board -> Int -> Board
-nextBoardGen board prob = [nextCellGenP cell (neighbours cell board) prob | cell <- board]
+nextBoardGen:: Board -> Int -> [Int] -> Board
+nextBoardGen board prob randList = [nextCellGenP cell (neighbours cell board) (pick prob (randList !! i)) | (i, cell) <- (zip [0..] board)]
 
 -- returns true if all cells on the board are dead, else false
 allDead :: Board -> Bool
@@ -143,6 +143,17 @@ allDead board = all (==Dead) [state | (Cell state position) <- board]
 
 -- if all dead then return EndOfGame
 -- if not then calculate the next board and return it as part of ContinueGame
+gameOfLife :: Board -> Int -> IO Result
+gameOfLife board p = 
+    do
+        rg <- newStdGen
+        let randList = randomRs (0,99) rg
+        let nextBoard = nextBoardGen board p randList
+        if allDead nextBoard
+            then do
+                return (EndOfGame nextBoard)
+            else do
+                return (ContinueGame nextBoard)
 
 --gameOfLife board
 --    | allDead nextBoard = EndOfGame nextBoard
