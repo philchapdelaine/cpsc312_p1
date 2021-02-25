@@ -31,7 +31,7 @@ data World = Game
 -- Initial state of the board
 initialWorld = Game
     {
-    aliveCells = [(1,1),(2,2)],
+    aliveCells = [(1,1),(2,2)], -- TODO add user input
     time = 0.0,
     fps = 20	}
 
