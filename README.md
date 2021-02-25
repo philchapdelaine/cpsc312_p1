@@ -1,10 +1,18 @@
-# cpsc312_p1
-About Haskell implementation of Conway's Game of Life
+# cpsc312_p1: Game of Probable Life
 
-Game of Probable Life
 Authors: Emily, Philippe, and Phoebe
 
-To run, type `ghc life` into your terminal and then `./life`
+#### How to build and run
+
+You may need to install these libraries:
+
+`cabal install gloss`
+`cabal install random`
+
+To build: type `ghc life` into your terminal.
+To run: `./life`
+
+#### About
 
 What is the problem?
 We will use Haskell to implement a simulation of Conway's Game of Life.
