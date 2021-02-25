@@ -123,6 +123,9 @@ pick p index = (replicate p 1 ++ (replicate (100-p) 0)) !! index
 --nb = neighbours c3 board
 --neigh = neighbours c6 board
 
+-- Generates next board 
+nextBoardGen:: Board -> Int -> Board
+nextBoardGen board prob = [nextCellGenP cell (neighbours cell board) prob | cell <- board]
 
 -- returns true if all cells on the board are dead, else false
 allDead :: Board -> Bool
