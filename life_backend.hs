@@ -93,7 +93,7 @@ stillDead (Cell state position) nb prob = if ((count (==True) (map isAlive nb)) 
 
 -- Based on the probability given, the cell changes state. Otherwise the cell remains the same
 switch :: Cell -> Int -> Cell
-switch (Cell state position) a = if ((state == Alive && a == 1) || (state == Dead && a == 0)) then (Cell Dead position) else (Cell Alive position)
+switch (Cell state position) a = if ((state == Alive && a == 1) || (state == Dead && a == 1)) then (Cell Dead position) else (Cell Alive position)
 
 
 -- Given a probability, p (1-100), generates a list with p 1's and (100-p) 0's and chooses a value at the given index
@@ -139,18 +139,21 @@ allDead board = all (==Dead) [state | (Cell state position) <- board]
 
 -- if all dead then return EndOfGame
 -- if not then calculate the next board and return it as part of ContinueGame
-gameOfLife :: Board -> Int -> IO Result
+gameOfLife :: Board -> Int -> IO Board
 gameOfLife board p =
     do
         rg <- newStdGen
         let randList = randomRs (0,99) rg
         let nextBoard = removeDeadCells (nextBoardGen board p randList)
         putStrLn(show nextBoard)
+        return nextBoard
+        {-
         if allDead nextBoard
             then do
                 return (EndOfGame nextBoard)
             else do
                 return (ContinueGame nextBoard)
+                -}
 
 --test case
 --let cell1 = Cell Alive (3,3)
@@ -158,4 +161,3 @@ gameOfLife board p =
 --let cell3 = Cell Alive (3,5)
 --let board = [cell1, cell2, cell3]
 --gameOfLife board 100
-

@@ -29,26 +29,23 @@ data World = Game
     time :: Float,
     fps :: Int }
 
-cell1 = Cell Alive (1,1)
-cell2 = Cell Alive (1,2)
-cell3 = Cell Alive (3,1)
-cell4 = Cell Alive (2,1)
-cell5 = Cell Alive (2,3)
-cell6 = Cell Alive (3,3)
+cell1 = Cell Alive (3,2)
+cell2 = Cell Alive (3,3)
+cell3 = Cell Alive (3,4)
 
 -- Initial state of the board
 initialWorld = Game
     {
-    aliveCells = [cell1, cell2, cell3, cell4, cell5, cell6], -- TODO add user input
+    aliveCells = [cell1, cell2, cell3], -- TODO add user input
     prob = 100,
     time = 0.0,
-    fps = 60 }
+    fps = 1 }
 
 main :: IO ()
 main = playIO
   window
   background
-  60
+  1
   initialWorld
   drawingFunc
   inputHandler
@@ -84,12 +81,10 @@ inputHandler (EventKey (SpecialKey KeyUp) Up _ _) world = return world {prob = 1
 inputHandler _ w = return w
 
 updateFunc :: Float -> World -> IO World
-updateFunc _ world = return world
-{- uncomment
+updateFunc _ world =
       do
         newResult <- Life_backend.gameOfLife (aliveCells world) (prob world)
         return world { aliveCells = newResult }
-        -}
 
 -- prints the probability on the grid
 printProb prob
