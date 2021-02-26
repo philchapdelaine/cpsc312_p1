@@ -84,19 +84,19 @@ nextCellGenP (Cell state position) nb prob = if state == Alive then stillAlive (
 -- Determines if a living cell remains alive
 -- A cell with 2 or 3 living neighbours remains alive, otherwise the cell dies with the given probability
 stillAlive :: Cell -> [Cell] -> Int -> Cell
-stillAlive (Cell state position) nb prob = if count (==True) (map isAlive nb) `elem` [2,3] then (Cell Alive position) else switch (Cell Alive position) prob
+stillAlive (Cell state position) nb prob = if ((count (==True) (map isAlive nb)) `elem` [2,3]) then (Cell Alive position) else switch (Cell Alive position) prob
 
 -- Determines if a dead cell remains dead
 -- A cell with 3 living neighbours becomes alive with given probability, otherwise the cell remains dead
 stillDead :: Cell -> [Cell] -> Int -> Cell
-stillDead (Cell state position) nb prob = if count (==True) (map isAlive nb) == 3 then switch (Cell Dead position) prob else (Cell Dead position)
+stillDead (Cell state position) nb prob = if ((count (==True) (map isAlive nb)) == 3) then switch (Cell Dead position) prob else (Cell Dead position)
 
 -- Based on the probability given, the cell changes state. Otherwise the cell remains the same
 switch :: Cell -> Int -> Cell
-switch (Cell state position) a = if (state == Alive && a == 1) || (state == Dead && a == 0) then (Cell Dead position) else (Cell Alive position)
+switch (Cell state position) a = if ((state == Alive && a == 1) || (state == Dead && a == 0)) then (Cell Dead position) else (Cell Alive position)
 
 
--- Given a probability, p (1-100), generates a list with p 1's and (100-p) 0's and chooses a value at random
+-- Given a probability, p (1-100), generates a list with p 1's and (100-p) 0's and chooses a value at the given index
 --pick :: Num b => Int -> IO b
 --pick p = (\index -> (replicate p 1 ++ (replicate (100-p) 0)) !! index) <$> randomRIO (0,99)
 pick :: Num a => Int -> Int -> a
@@ -136,12 +136,6 @@ allDead board = all (==Dead) [state | (Cell state position) <- board]
 -- allDead board
 -- allDead []
 
---test case
---let cell1 = Cell Alive (3,3)
---let cell2 = Cell Alive (3,4)
---let cell3 = Cell Alive (3,5)
---let board = [cell1, cell2, cell3]
---gameOfLife board 100
 
 -- if all dead then return EndOfGame
 -- if not then calculate the next board and return it as part of ContinueGame
@@ -157,4 +151,11 @@ gameOfLife board p =
                 return (EndOfGame nextBoard)
             else do
                 return (ContinueGame nextBoard)
+
+--test case
+--let cell1 = Cell Alive (3,3)
+--let cell2 = Cell Alive (3,4)
+--let cell3 = Cell Alive (3,5)
+--let board = [cell1, cell2, cell3]
+--gameOfLife board 100
 
