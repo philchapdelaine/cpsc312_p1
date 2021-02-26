@@ -73,16 +73,6 @@ count :: Num p => (t -> Bool) -> [t] -> p
 count p [] = 0
 count p (h:t) = if p h then 1 + count p t else count p t
 
--- !!TODO!!: given a cell and it's neighbours (and a probability?), return the cell in the next generation
--- A cell with 2 or 3 live neighbours survives
--- A dead cell with 3 live neighbours becomes live
--- All other cells become dead. Dead cells stay dead
---nextCellGeneration :: Cell -> [Cell] -> Cell
---nextCellGeneration (Cell state position) nb = if state == Alive then stillAlive (Cell Alive position) nb else stillDead (Cell Dead position) nb
---   where
---       stillAlive c nb = if count (==True) (map isAlive nb) `elem` [2,3] then (Cell Alive position) else (Cell Dead position)
---       stillDead c nb = if count (==True) (map isAlive nb) == 3 then (Cell Alive position) else (Cell Dead position)
-
 
 -- Generates the next cell state given the cell, its neighbours and a probability (0-100)
 -- A cell with 2 or 3 live neighbours survives
@@ -123,9 +113,15 @@ pick p index = (replicate p 1 ++ (replicate (100-p) 0)) !! index
 --nb = neighbours c3 board
 --neigh = neighbours c6 board
 
--- Generates next board
-nextBoardGen:: Board -> Int -> [Int] -> Board
+-- Generates next board with a given probability and an infinite list of random numbers in the range (0-99)
+nextBoardGen :: Board -> Int -> [Int] -> Board
 nextBoardGen board prob randList = [nextCellGenP cell (neighbours cell board) (pick prob (randList !! i)) | (i, cell) <- (zip [0..] board)]
+
+
+-- Removes all dead cells from the board
+removeDeadCells :: Board -> Board
+removeDeadCells board = [ (Cell state position) | (Cell state position) <- board, state == Alive ]
+
 
 -- returns true if all cells on the board are dead, else false
 allDead :: Board -> Bool
@@ -148,7 +144,7 @@ gameOfLife board p =
     do
         rg <- newStdGen
         let randList = randomRs (0,99) rg
-        let nextBoard = nextBoardGen board p randList
+        let nextBoard = removeDeadCells (nextBoardGen board p randList)
         putStrLn(show nextBoard)
         if allDead nextBoard
             then do
