@@ -24,15 +24,19 @@ makePicture n = rectangleSolid n n
 
 -- Description of a state of the world
 data World = Game
-    { aliveCells :: [(Float,Float)],
+    { aliveCells :: [Cell],
     prob :: Int,
     time :: Float,
     fps :: Int	}
 
+cell1 = Cell Alive (1,1)
+cell2 = Cell Alive (1,2)
+cell3 = Cell Alive (3,1)
+
 -- Initial state of the board
 initialWorld = Game
     {
-    aliveCells = [(1,1),(2,2)], -- TODO add user input
+    aliveCells = [cell1, cell2, cell3], -- TODO add user input
     prob = 100,
     time = 0.0,
     fps = 20	}
@@ -49,7 +53,7 @@ main = playIO
 
 drawingFunc :: World -> IO Picture
 drawingFunc world = return (Pictures $ grid ++ aliveCellsPictures ++ [printProb (prob world)])
-   where aliveCellsPictures = [drawCell (a,b) | (a,b) <- aliveCells world]
+   where aliveCellsPictures = [drawCell (position) | (Cell state position) <- aliveCells  world]
 
 -- Defines a grid space
 w = (fromIntegral width)
@@ -77,7 +81,12 @@ inputHandler (EventKey (SpecialKey KeyUp) Up _ _) world = return world {prob = 1
 inputHandler _ w = return w
 
 updateFunc :: Float -> World -> IO World
-updateFunc _ world = return world -- { aliveCells = (gameOfLife (aliveCells world) (prob world))}
+updateFunc _ world = return world
+  {-    do
+        newResult <- Life_backend.gameOfLife (aliveCells world) (prob world)
+        -- let newBoard = (board newResult)
+        return world { aliveCells = newResult }\
+        -}
 
 -- prints the probability on the grid
 printProb prob
