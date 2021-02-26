@@ -64,20 +64,21 @@ neighbours (Cell _ position) board =
 -- neighbours cell1 board
 
 -- Given a cell and the board, generates the positions where new cells are to be made
-getNewCellPositions :: Cell -> [Cell] -> [Position]
-getNewCellPositions (Cell _ position) board = otherAdjacents
+getNewNeighbours :: Cell -> [Cell] -> [Position]
+getNewNeighbours (Cell _ position) board = otherAdjacents
     where
         adjacentPositions = getAdjacents position
         currAdjacents = [(Cell state position) | (Cell state position) <- board,  position `elem` adjacentPositions] -- Already existing cells on board
         otherAdjacents = [position | position <- adjacentPositions, not (position `elem` (getCellPositions currAdjacents))] -- Cells currently not on the board
 
 -- Takes a board, and generates all possible positions for new cells
-generateDeadNeighbours :: [Cell] -> [[Position]]
-generateDeadNeighbours board = [getNewCellPositions (Cell state position) board | (Cell state position) <- board, state == Alive]
+getNewCellPositions :: [Cell] -> [Position]
+getNewCellPositions board = refine [getNewNeighbours (Cell state position) board | (Cell state position) <- board, state == Alive]
+    where 
+        refine lst = nub (concat lst)
 
-
---refine lst = filter (\(a,b) -> anub (concat lst)
-
+makeNewCells :: [Position] -> [Cell] -> [Cell]
+makeNewCells positions board = foldr (:) board [(Cell Dead pos) | pos <- positions]
 
 -- returns True if cell is Alive
 isAlive :: Cell -> Bool
