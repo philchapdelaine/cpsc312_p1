@@ -32,6 +32,8 @@ data World = Game
 cell1 = Cell Alive (3,2)
 cell2 = Cell Alive (3,3)
 cell3 = Cell Alive (3,4)
+cell4 = Cell Dead (4,3)
+cell5 = Cell Dead (4,4)
 
 -- Initial state of the board
 initialWorld = Game

@@ -1,6 +1,7 @@
 module Life_backend where
 
 import System.Random
+import Data.List
 
 -- currently I worry we might have a problem where the Board will get too big
 -- some solutions could be: - have a set width and height of the board - not a huge fan since the board should be infinite in the game of life
@@ -62,6 +63,22 @@ neighbours (Cell _ position) board =
 -- let board = [cell1, cell2]
 -- neighbours cell1 board
 
+-- Given a cell and the board, generates the positions where new cells are to be made
+getNewCellPositions :: Cell -> [Cell] -> [Position]
+getNewCellPositions (Cell _ position) board = otherAdjacents
+    where
+        adjacentPositions = getAdjacents position
+        currAdjacents = [(Cell state position) | (Cell state position) <- board,  position `elem` adjacentPositions] -- Already existing cells on board
+        otherAdjacents = [position | position <- adjacentPositions, not (position `elem` (getCellPositions currAdjacents))] -- Cells currently not on the board
+
+-- Takes a board, and generates all possible positions for new cells
+generateDeadNeighbours :: [Cell] -> [[Position]]
+generateDeadNeighbours board = [getNewCellPositions (Cell state position) board | (Cell state position) <- board, state == Alive]
+
+
+--refine lst = filter (\(a,b) -> anub (concat lst)
+
+
 -- returns True if cell is Alive
 isAlive :: Cell -> Bool
 isAlive (Cell state _)
@@ -103,15 +120,15 @@ pick :: Num a => Int -> Int -> a
 pick p index = (replicate p 1 ++ (replicate (100-p) 0)) !! index
 
 --tests
---c1 = Cell Alive (0,1)
---c2 = Cell Alive (1,0)
---c3 = Cell Alive (1,1)
---c4 = Cell Alive (1,2)
---c5 = Cell Alive (2,1)
---c6 = Cell Dead (2,2)
---board = [c1,c2,c3,c4,c5,c6]
---nb = neighbours c3 board
---neigh = neighbours c6 board
+c1 = Cell Alive (0,1)
+c2 = Cell Alive (1,0)
+c3 = Cell Alive (1,1)
+c4 = Cell Alive (1,2)
+c5 = Cell Alive (2,1)
+c6 = Cell Dead (2,2)
+board = [c1,c2,c3,c4,c5,c6]
+nb = neighbours c3 board
+neigh = neighbours c6 board
 
 -- Generates next board with a given probability and an infinite list of random numbers in the range (0-99)
 nextBoardGen :: Board -> Int -> [Int] -> Board
