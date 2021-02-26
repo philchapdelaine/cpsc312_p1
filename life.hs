@@ -33,7 +33,7 @@ data World = Game
 initialWorld = Game
     {
     aliveCells = [(1,1),(2,2)], -- TODO add user input
-    prob = 1,
+    prob = 100,
     time = 0.0,
     fps = 20	}
 
@@ -73,11 +73,11 @@ square = rectangleSolid (w/x) (h/y)
 
 inputHandler :: Event -> World -> World
 inputHandler (EventKey (SpecialKey KeyDown) Down _ _) world = world {prob = 0}
-inputHandler (EventKey (SpecialKey KeyUp) Up _ _) world = world {prob = 1}
+inputHandler (EventKey (SpecialKey KeyUp) Up _ _) world = world {prob = 100}
 inputHandler _ w = w
 
 updateFunc :: Float -> World -> World
-updateFunc _ world = world -- { aliveCells = (nextBoardGen (world { aliveCells }) world { prob } [1,0,1])}
+updateFunc _ world = world -- { aliveCells = (gameOfLife (aliveCells world) (prob world))}
 
 -- prints the probability on the grid
 printProb prob
