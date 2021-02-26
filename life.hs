@@ -25,6 +25,7 @@ makePicture n = rectangleSolid n n
 -- Description of a state of the world
 data World = Game
     { aliveCells :: [(Float,Float)],
+    prob :: Int,
     time :: Float,
     fps :: Int	}
 
@@ -32,6 +33,7 @@ data World = Game
 initialWorld = Game
     {
     aliveCells = [(1,1),(2,2)], -- TODO add user input
+    prob = 100,
     time = 0.0,
     fps = 20	}
 
@@ -46,7 +48,7 @@ main = play
   updateFunc
 
 drawingFunc :: World -> Picture
-drawingFunc world = Pictures $ grid ++ aliveCellsPictures
+drawingFunc world = Pictures $ grid ++ aliveCellsPictures ++ [printProb (prob world)]
    where aliveCellsPictures = [drawCell (a,b) | (a,b) <- aliveCells world]
 
 -- Defines a grid space
@@ -70,12 +72,18 @@ drawCell (x0,y0) =  translate (x0*w/x -w/2 +  w/x/2) (-y0*h/y +h/2 -h/y/2) squar
 square = rectangleSolid (w/x) (h/y)
 
 inputHandler :: Event -> World -> World
--- handleKeys (EventKey (SpecialKey KeyUp) Down _ _) world = world { fps = changeFps (fps world) 5 }
+inputHandler (EventKey (SpecialKey KeyDown) Down _ _) world = world {prob = 0}
+inputHandler (EventKey (SpecialKey KeyUp) Up _ _) world = world {prob = 100}
 inputHandler _ w = w
 
 updateFunc :: Float -> World -> World
-updateFunc _ world = world
+updateFunc _ world = world -- { aliveCells = (gameOfLife (aliveCells world) (prob world))}
 
+-- prints the probability on the grid
+printProb prob
+	= Translate (-70) (-280)
+	$ Scale 0.25 0.25
+	$ Text ("probability is: " ++ show prob)
 
 -- render new board after every second, gets passed the time in seconds since program start
 -- renderBoard :: Float -> Picture
