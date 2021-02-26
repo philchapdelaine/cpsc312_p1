@@ -38,7 +38,7 @@ initialWorld = Game
     fps = 20	}
 
 main :: IO ()
-main = play
+main = playIO
   window
   background
   20
@@ -47,8 +47,8 @@ main = play
   inputHandler
   updateFunc
 
-drawingFunc :: World -> Picture
-drawingFunc world = Pictures $ grid ++ aliveCellsPictures ++ [printProb (prob world)]
+drawingFunc :: World -> IO Picture
+drawingFunc world = return (Pictures $ grid ++ aliveCellsPictures ++ [printProb (prob world)])
    where aliveCellsPictures = [drawCell (a,b) | (a,b) <- aliveCells world]
 
 -- Defines a grid space
@@ -71,13 +71,13 @@ drawCell (x0,y0) =  translate (x0*w/x -w/2 +  w/x/2) (-y0*h/y +h/2 -h/y/2) squar
 -- Filled in cells look like this
 square = rectangleSolid (w/x) (h/y)
 
-inputHandler :: Event -> World -> World
-inputHandler (EventKey (SpecialKey KeyDown) Down _ _) world = world {prob = 0}
-inputHandler (EventKey (SpecialKey KeyUp) Up _ _) world = world {prob = 100}
-inputHandler _ w = w
+inputHandler :: Event -> World -> IO World
+inputHandler (EventKey (SpecialKey KeyDown) Down _ _) world = return world {prob = 0}
+inputHandler (EventKey (SpecialKey KeyUp) Up _ _) world = return world {prob = 100}
+inputHandler _ w = return w
 
-updateFunc :: Float -> World -> World
-updateFunc _ world = world -- { aliveCells = (gameOfLife (aliveCells world) (prob world))}
+updateFunc :: Float -> World -> IO World
+updateFunc _ world = return world -- { aliveCells = (gameOfLife (aliveCells world) (prob world))}
 
 -- prints the probability on the grid
 printProb prob
