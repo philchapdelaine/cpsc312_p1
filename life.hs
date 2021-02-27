@@ -32,13 +32,13 @@ data World = Game
 cell1 = Cell Alive (3,2)
 cell2 = Cell Alive (3,3)
 cell3 = Cell Alive (3,4)
-cell4 = Cell Dead (4,3)
-cell5 = Cell Dead (4,4)
+cell4 = Cell Alive (4,3)
+cell5 = Cell Alive (4,4)
 
 -- Initial state of the board
 initialWorld = Game
     {
-    aliveCells = [cell1, cell2, cell3], -- TODO add user input
+    aliveCells = [cell1, cell2, cell3, cell4], -- TODO add user input
     prob = 100,
     time = 0.0,
     fps = 1 }
