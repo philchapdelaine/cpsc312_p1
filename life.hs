@@ -80,6 +80,11 @@ square = rectangleSolid (w/x) (h/y)
 inputHandler :: Event -> World -> IO World
 inputHandler (EventKey (SpecialKey KeyDown) Down _ _) world = return world {prob = 0}
 inputHandler (EventKey (SpecialKey KeyUp) Up _ _) world = return world {prob = 100}
+inputHandler (EventKey (Char '1') Down _ _) world = return world {aliveCells = state1}
+inputHandler (EventKey (Char '2') Down _ _) world = return world {aliveCells = state2}
+inputHandler (EventKey (Char '3') Down _ _) world = return world {aliveCells = state3}
+inputHandler (EventKey (Char '4') Down _ _) world = return world {aliveCells = state4}
+inputHandler (EventKey (Char '5') Down _ _) world = return world {aliveCells = state5}
 inputHandler _ w = return w
 
 updateFunc :: Float -> World -> IO World
@@ -90,9 +95,9 @@ updateFunc _ world =
 
 -- prints the probability on the grid
 printProb prob
-	= Translate (-70) (-280)
-	$ Scale 0.25 0.25
-	$ Text ("probability is: " ++ show prob)
+  = Translate (-70) (-280)
+  $ Scale 0.25 0.25
+  $ Text ("probability is: " ++ show prob)
 
 -- render new board after every second, gets passed the time in seconds since program start
 -- renderBoard :: Float -> Picture
