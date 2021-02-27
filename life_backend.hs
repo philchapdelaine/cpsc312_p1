@@ -77,7 +77,8 @@ getNewCellPositions board = refine [getNewNeighbours (Cell state position) board
     where 
         refine lst = nub (concat lst)
 
-makeNewCells :: [Position] -> [Cell] -> [Cell]
+-- Makes new dead cells at the given positions and adds them to the board
+makeNewCells :: [Position] -> [Cell] -> Board
 makeNewCells positions board = foldr (:) board [(Cell Dead pos) | pos <- positions]
 
 -- returns True if cell is Alive
