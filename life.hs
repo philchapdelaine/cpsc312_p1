@@ -68,7 +68,7 @@ state5 = [cell18, cell19, cell20, cell21, cell22, cell23, cell24] -- acorn
 -- Initial state of the board
 initialWorld = Game
     {
-    aliveCells = state1, 
+    aliveCells = state1,
     prob = 100,
     time = 0.0,
     fps = 10 }
@@ -96,16 +96,18 @@ x = 50
 y = 50
 
 -- Defines the grid and the size of each cell
+grid :: [Picture]
 grid = verticalLines ++ horizontalLines ++ [rectangleWire w h]
     where verticalLines = foldr (\a -> \b -> vLine a:b) [] [0..x]
           vLine a = color  (greyN 0.5)  (line [ (w/x*a-w/2, -h/2), (w/x*a-w/2, h-h/2) ])
           horizontalLines = foldr (\a -> \b -> hLine a:b) [] [0..y]
           hLine a = color  (greyN 0.5)  (line [ (-w/2, h/y*a-h/2), (w-w/2, h/y*a-h/2) ])
 
-
+drawCell :: (Float, Float) -> Picture
 drawCell (x0,y0) =  translate (x0*w/x -w/2 +  w/x/2) (-y0*h/y +h/2 -h/y/2) square
 
 -- Filled in cells look like this
+square :: Picture
 square = rectangleSolid (w/x) (h/y)
 
 -- Takes in a key event and action and returns the new changed world
@@ -119,7 +121,7 @@ inputHandler (EventKey (Char '2') Down _ _) world = return world {aliveCells = s
 inputHandler (EventKey (Char '3') Down _ _) world = return world {aliveCells = state3} -- f-pentomino
 inputHandler (EventKey (Char '4') Down _ _) world = return world {aliveCells = state4} -- tetromino
 inputHandler (EventKey (Char '5') Down _ _) world = return world {aliveCells = state5} -- acorn
-inputHandler (EventKey (SpecialKey KeyEsc) Down _ _) world = exitSuccess 
+inputHandler (EventKey (SpecialKey KeyEsc) Down _ _) world = exitSuccess
 inputHandler _ w = return w
 
 -- Generates the next state of the world
@@ -130,6 +132,7 @@ updateFunc _ world =
         return world { aliveCells = newResult }
 
 -- Prints the probability on the grid
+printProb ::  Int -> Picture
 printProb prob
   = Translate (-70) (-280)
   $ Scale 0.25 0.25
