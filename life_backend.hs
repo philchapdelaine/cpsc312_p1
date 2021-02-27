@@ -68,17 +68,17 @@ getNewNeighbours :: Cell -> [Cell] -> [Position]
 getNewNeighbours (Cell _ position) board = otherAdjacents
     where
         adjacentPositions = getAdjacents position
-        currAdjacents = [(Cell state position) | (Cell state position) <- board,  position `elem` adjacentPositions] -- Already existing cells on board
-        otherAdjacents = [position | position <- adjacentPositions, not (position `elem` (getCellPositions currAdjacents))] -- Cells currently not on the board
+        currAdjacents = [position | (Cell state position) <- board,  position `elem` adjacentPositions] -- Already existing postions of cells on board
+        otherAdjacents = [position | position <- adjacentPositions, not (position `elem` currAdjacents)] -- Postions of cells currently not on the board
 
 -- Takes a board, and generates all possible positions for new cells
-getNewCellPositions :: [Cell] -> [Position]
+getNewCellPositions :: Board -> [Position]
 getNewCellPositions board = refine [getNewNeighbours (Cell state position) board | (Cell state position) <- board, state == Alive]
     where 
         refine lst = nub (concat lst)
 
 -- Makes new dead cells at the given positions and adds them to the board
-makeNewCells :: [Position] -> [Cell] -> Board
+makeNewCells :: [Position] -> Board -> Board
 makeNewCells positions board = foldr (:) board [(Cell Dead pos) | pos <- positions]
 
 -- returns True if cell is Alive
@@ -112,7 +112,7 @@ stillDead (Cell state position) nb prob = if ((count (==True) (map isAlive nb)) 
 
 -- Based on the probability given, the cell changes state. Otherwise the cell remains the same
 switch :: Cell -> Int -> Cell
-switch (Cell state position) a = if ((state == Alive && a == 1) || (state == Dead && a == 1)) then (Cell Dead position) else (Cell Alive position)
+switch (Cell state position) a = if ((state == Alive && a == 1) || (state == Dead && a == 0)) then (Cell Dead position) else (Cell Alive position)
 
 
 -- Given a probability, p (1-100), generates a list with p 1's and (100-p) 0's and chooses a value at the given index
@@ -122,15 +122,15 @@ pick :: Num a => Int -> Int -> a
 pick p index = (replicate p 1 ++ (replicate (100-p) 0)) !! index
 
 --tests
-c1 = Cell Alive (0,1)
-c2 = Cell Alive (1,0)
-c3 = Cell Alive (1,1)
-c4 = Cell Alive (1,2)
-c5 = Cell Alive (2,1)
-c6 = Cell Dead (2,2)
-board = [c1,c2,c3,c4,c5,c6]
-nb = neighbours c3 board
-neigh = neighbours c6 board
+-- c1 = Cell Alive (0,1)
+-- c2 = Cell Alive (1,0)
+-- c3 = Cell Alive (1,1)
+-- c4 = Cell Alive (1,2)
+-- c5 = Cell Alive (2,1)
+-- c6 = Cell Dead (2,2)
+-- board = [c1,c2,c3,c4,c5,c6]
+-- nb = neighbours c3 board
+-- neigh = neighbours c6 board
 
 -- Generates next board with a given probability and an infinite list of random numbers in the range (0-99)
 nextBoardGen :: Board -> Int -> [Int] -> Board
@@ -163,8 +163,10 @@ gameOfLife board p =
     do
         rg <- newStdGen
         let randList = randomRs (0,99) rg
-        let nextBoard = removeDeadCells (nextBoardGen board p randList)
-        putStrLn(show nextBoard)
+            newCellPositions = getNewCellPositions board
+            filledBoard = makeNewCells newCellPositions board
+            nextBoard = removeDeadCells (nextBoardGen filledBoard p randList)
+        putStrLn(show filledBoard)
         return nextBoard
         {-
         if allDead nextBoard
