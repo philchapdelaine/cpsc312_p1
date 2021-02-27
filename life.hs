@@ -7,13 +7,13 @@ import System.Exit
 
 import Life_backend
 
--- everything below is gloss stuff
 
--- window width and height in pixels
+
+-- Window width and height in pixels
 width = 800
 height = 800
 
--- defines the window of the canvas: height, width and top left location
+-- Defines the window of the canvas: height, width and top left location
 window :: Display
 window = InWindow "Game of Probable Life" (width, height) (0, 0)
 
@@ -64,10 +64,11 @@ state2 = [cell4, cell5, cell6, cell7, cell8] -- glider
 state3 = [cell9, cell10, cell11, cell12, cell13] -- f-pentomino
 state4 = [cell14, cell15, cell16, cell17] -- tetromino
 state5 = [cell18, cell19, cell20, cell21, cell22, cell23, cell24] -- acorn
+
 -- Initial state of the board
 initialWorld = Game
     {
-    aliveCells = state1, -- TODO add user input
+    aliveCells = state1, 
     prob = 100,
     time = 0.0,
     fps = 10 }
@@ -86,7 +87,6 @@ drawingFunc :: World -> IO Picture
 drawingFunc world = return (Pictures $ grid ++ aliveCellsPictures ++ [printProb (prob world)])
    where aliveCellsPictures = [drawCell (position) | (Cell state position) <- aliveCells  world]
 
-
 -- Defines a grid space
 w = (fromIntegral width)
 h = (fromIntegral height)
@@ -95,44 +95,42 @@ h = (fromIntegral height)
 x = 50
 y = 50
 
--- defines the grid and the size of each cell
+-- Defines the grid and the size of each cell
 grid = verticalLines ++ horizontalLines ++ [rectangleWire w h]
     where verticalLines = foldr (\a -> \b -> vLine a:b) [] [0..x]
           vLine a = color  (greyN 0.5)  (line [ (w/x*a-w/2, -h/2), (w/x*a-w/2, h-h/2) ])
           horizontalLines = foldr (\a -> \b -> hLine a:b) [] [0..y]
           hLine a = color  (greyN 0.5)  (line [ (-w/2, h/y*a-h/2), (w-w/2, h/y*a-h/2) ])
 
+
 drawCell (x0,y0) =  translate (x0*w/x -w/2 +  w/x/2) (-y0*h/y +h/2 -h/y/2) square
 
 -- Filled in cells look like this
 square = rectangleSolid (w/x) (h/y)
 
+-- Takes in a key event and action and returns the new changed world
 inputHandler :: Event -> World -> IO World
-inputHandler (EventKey (SpecialKey KeyDown) Down _ _) world = return world {prob = if (prob world > 0) then (-10 + prob world) else (prob world)}
-inputHandler (EventKey (SpecialKey KeyUp) Down _ _) world = return world {prob = if (prob world < 100) then (10 + prob world) else (prob world)}
-inputHandler (EventKey (SpecialKey KeyLeft) Down _ _) world = return world {prob = 100}
-inputHandler (EventKey (SpecialKey KeyRight) Down _ _) world = return world {prob = 0}
-inputHandler (EventKey (Char '1') Down _ _) world = return world {aliveCells = state1}
-inputHandler (EventKey (Char '2') Down _ _) world = return world {aliveCells = state2}
-inputHandler (EventKey (Char '3') Down _ _) world = return world {aliveCells = state3}
-inputHandler (EventKey (Char '4') Down _ _) world = return world {aliveCells = state4}
-inputHandler (EventKey (Char '5') Down _ _) world = return world {aliveCells = state5}
+inputHandler (EventKey (SpecialKey KeyDown) Down _ _) world = return world {prob = if (prob world > 0) then (-10 + prob world) else (prob world)} -- down arrow decreases probability by 10
+inputHandler (EventKey (SpecialKey KeyUp) Down _ _) world = return world {prob = if (prob world < 100) then (10 + prob world) else (prob world)} -- up arrow increases probability by 10
+inputHandler (EventKey (SpecialKey KeyLeft) Down _ _) world = return world {prob = 100} -- left arrow = probability 100%
+inputHandler (EventKey (SpecialKey KeyRight) Down _ _) world = return world {prob = 0} -- right arrow = probability 0%
+inputHandler (EventKey (Char '1') Down _ _) world = return world {aliveCells = state1} -- spinner
+inputHandler (EventKey (Char '2') Down _ _) world = return world {aliveCells = state2} -- glider
+inputHandler (EventKey (Char '3') Down _ _) world = return world {aliveCells = state3} -- f-pentomino
+inputHandler (EventKey (Char '4') Down _ _) world = return world {aliveCells = state4} -- tetromino
+inputHandler (EventKey (Char '5') Down _ _) world = return world {aliveCells = state5} -- acorn
 inputHandler (EventKey (SpecialKey KeyEsc) Down _ _) world = exitSuccess 
 inputHandler _ w = return w
 
-
-
+-- Generates the next state of the world
 updateFunc :: Float -> World -> IO World
 updateFunc _ world =
       do
         newResult <- Life_backend.gameOfLife (aliveCells world) (prob world)
         return world { aliveCells = newResult }
 
--- prints the probability on the grid
+-- Prints the probability on the grid
 printProb prob
   = Translate (-70) (-280)
   $ Scale 0.25 0.25
   $ Text ("probability is: " ++ show prob)
-
--- render new board after every second, gets passed the time in seconds since program start
--- renderBoard :: Float -> Picture

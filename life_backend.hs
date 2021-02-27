@@ -3,9 +3,8 @@ module Life_backend where
 import System.Random
 import Data.List
 
--- currently I worry we might have a problem where the Board will get too big
--- some solutions could be: - have a set width and height of the board - not a huge fan since the board should be infinite in the game of life
---                          - we trim it when an area is all "dead" - I like this one more and we can probably implement it later rather than sooner
+-- Haskell Implementation of Conway's Game of Life with probability
+-- Cells change state based on the set probability
 
 type Position = (Float,Float)
 
@@ -21,7 +20,7 @@ data Result = EndOfGame Board       -- end of game, everything is dead
             | ContinueGame Board    -- continue with updated board
 
 
--- get all the internal postions from a list of cells
+-- Get all the internal postions from a list of cells
 getCellPositions :: [Cell] -> [Position]
 getCellPositions cells = [position | (Cell state position) <- cells]
 
@@ -48,7 +47,7 @@ getAdjacents (x,y) = map (\ (i,j) -> (i+x, j+y)) adjacent
 -- getAdjacents (3,4)
 
 
--- given a Cell and the Board it resides on, return a list of it's neighbouring Cells
+-- Given a Cell and the Board it resides on, return a list of it's neighbouring Cells
 neighbours :: Cell -> Board -> [Cell]
 neighbours (Cell _ position) board =
     currAdjacents ++ otherAdjacents
@@ -87,12 +86,10 @@ isAlive (Cell state _)
     | state == Alive = True
     | otherwise = False
 
--- counts the number of occurances in the list that matches parameter p
+-- Counts the number of occurances in the list that matches parameter p
 count :: Num p => (t -> Bool) -> [t] -> p
 count p [] = 0
 count p (h:t) = if p h then 1 + count p t else count p t
-
-add a b = a + b
 
 -- Generates the next cell state given the cell, its neighbours and a probability (0-100)
 -- A cell with 2 or 3 live neighbours survives
@@ -116,9 +113,7 @@ switch :: Cell -> Int -> Cell
 switch (Cell state position) a = if ((state == Alive && a == 1) || (state == Dead && a == 0)) then (Cell Dead position) else (Cell Alive position)
 
 
--- Given a probability, p (1-100), generates a list with p 1's and (100-p) 0's and chooses a value at the given index
---pick :: Num b => Int -> IO b
---pick p = (\index -> (replicate p 1 ++ (replicate (100-p) 0)) !! index) <$> randomRIO (0,99)
+-- Given a probability, p (1-100), generates a list with p 1's and (100-p) 0's and returns the value at the given index
 pick :: Num a => Int -> Int -> a
 pick p index = (replicate p 1 ++ (replicate (100-p) 0)) !! index
 
@@ -143,7 +138,7 @@ removeDeadCells :: Board -> Board
 removeDeadCells board = [ (Cell state position) | (Cell state position) <- board, state == Alive ]
 
 
--- returns true if all cells on the board are dead, else false
+-- Returns true if all cells on the board are dead, else false
 allDead :: Board -> Bool
 allDead board = all (==Dead) [state | (Cell state position) <- board]
 
@@ -156,9 +151,8 @@ allDead board = all (==Dead) [state | (Cell state position) <- board]
 -- allDead board
 -- allDead []
 
-
--- if all dead then return EndOfGame
--- if not then calculate the next board and return it as part of ContinueGame
+-- Calculates the next board 
+-- If all cells are dead, returns EndGame, otherwise, returns the board as part a of ContinueGame
 gameOfLife :: Board -> Int -> IO Board
 gameOfLife board p =
     do
@@ -169,14 +163,7 @@ gameOfLife board p =
             nextBoard = removeDeadCells (nextBoardGen filledBoard p randList)
         putStrLn(show filledBoard)
         return nextBoard
-        {-
-        if allDead nextBoard
-            then do
-                return (EndOfGame nextBoard)
-            else do
-                return (ContinueGame nextBoard)
-                -}
-
+        
 --test case
 --let cell1 = Cell Alive (3,3)
 --let cell2 = Cell Alive (3,4)
