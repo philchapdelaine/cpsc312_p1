@@ -92,6 +92,7 @@ count :: Num p => (t -> Bool) -> [t] -> p
 count p [] = 0
 count p (h:t) = if p h then 1 + count p t else count p t
 
+add a b = a + b
 
 -- Generates the next cell state given the cell, its neighbours and a probability (0-100)
 -- A cell with 2 or 3 live neighbours survives

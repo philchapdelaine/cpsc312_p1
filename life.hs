@@ -14,7 +14,7 @@ height = 800
 
 -- defines the window of the canvas: height, width and top left location
 window :: Display
-window = InWindow "Game of Pobable Life" (width, height) (0, 0)
+window = InWindow "Game of Probable Life" (width, height) (0, 0)
 
 background :: Color
 background = white
@@ -33,12 +33,13 @@ cell1 = Cell Alive (3,2)
 cell2 = Cell Alive (3,3)
 cell3 = Cell Alive (3,4)
 cell4 = Cell Alive (4,3)
-cell5 = Cell Alive (4,4)
+cell5 = Cell Alive (2,4)
+cell6 = Cell Alive (1,2)
 
 -- Initial state of the board
 initialWorld = Game
     {
-    aliveCells = [cell1, cell2, cell3, cell4], -- TODO add user input
+    aliveCells = [cell1, cell2, cell3, cell5, cell6], -- TODO add user input
     prob = 100,
     time = 0.0,
     fps = 1 }
@@ -56,6 +57,7 @@ main = playIO
 drawingFunc :: World -> IO Picture
 drawingFunc world = return (Pictures $ grid ++ aliveCellsPictures ++ [printProb (prob world)])
    where aliveCellsPictures = [drawCell (position) | (Cell state position) <- aliveCells  world]
+
 
 -- Defines a grid space
 w = (fromIntegral width)
@@ -78,9 +80,13 @@ drawCell (x0,y0) =  translate (x0*w/x -w/2 +  w/x/2) (-y0*h/y +h/2 -h/y/2) squar
 square = rectangleSolid (w/x) (h/y)
 
 inputHandler :: Event -> World -> IO World
-inputHandler (EventKey (SpecialKey KeyDown) Down _ _) world = return world {prob = 0}
-inputHandler (EventKey (SpecialKey KeyUp) Up _ _) world = return world {prob = 100}
+inputHandler (EventKey (SpecialKey KeyDown) Down _ _) world = return world {prob = 10 - prob world}
+inputHandler (EventKey (SpecialKey KeyUp) Down _ _) world = return world {prob = 10 + prob world}
+inputHandler (EventKey (SpecialKey KeyLeft) Down _ _) world = return world {prob = 100}
+inputHandler (EventKey (SpecialKey KeyRight) Down _ _) world = return world {prob = 0}
 inputHandler _ w = return w
+
+
 
 updateFunc :: Float -> World -> IO World
 updateFunc _ world =
