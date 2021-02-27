@@ -29,17 +29,44 @@ data World = Game
     time :: Float,
     fps :: Int }
 
-cell1 = Cell Alive (3,2)
-cell2 = Cell Alive (3,3)
-cell3 = Cell Alive (3,4)
-cell4 = Cell Alive (4,3)
-cell5 = Cell Alive (2,4)
-cell6 = Cell Alive (1,2)
+cell1 = Cell Alive (24,24)
+cell2 = Cell Alive (24,25)
+cell3 = Cell Alive (24,26)
 
+cell4 = Cell Alive (24,25)
+cell5 = Cell Alive (25,25)
+cell6 = Cell Alive (26,25)
+cell7 = Cell Alive (24,26)
+cell8 = Cell Alive (25,27)
+
+cell9 = Cell Alive (25,24)
+cell10 = Cell Alive (26,24)
+cell11 = Cell Alive (24,25)
+cell12 = Cell Alive (25,25)
+cell13 = Cell Alive (25,26)
+
+cell14 = Cell Alive (24,25)
+cell15 = Cell Alive (25,25)
+cell16 = Cell Alive (26,25)
+cell17 = Cell Alive (25,24)
+
+cell18 = Cell Alive (23,24)
+cell19 = Cell Alive (22,26)
+cell20 = Cell Alive (23,26)
+cell21 = Cell Alive (25,25)
+cell22 = Cell Alive (26,26)
+cell23 = Cell Alive (27,26)
+cell24 = Cell Alive (28,26)
+
+state1 = [cell1, cell2, cell3] -- spinner
+state2 = [cell4, cell5, cell6, cell7, cell8] -- glider
+state3 = [cell9, cell10, cell11, cell12, cell13] -- f-pentomino
+state4 = [cell14, cell15, cell16, cell17] -- tetromino
+state5 = [cell18, cell19, cell20, cell21, cell22, cell23, cell24] -- acorn
 -- Initial state of the board
 initialWorld = Game
     {
-    aliveCells = [cell1, cell2, cell3, cell5, cell6], -- TODO add user input
+    aliveCells = state1, -- TODO add user input
     prob = 100,
     time = 0.0,
     fps = 1 }
@@ -80,7 +107,7 @@ drawCell (x0,y0) =  translate (x0*w/x -w/2 +  w/x/2) (-y0*h/y +h/2 -h/y/2) squar
 square = rectangleSolid (w/x) (h/y)
 
 inputHandler :: Event -> World -> IO World
-inputHandler (EventKey (SpecialKey KeyDown) Down _ _) world = return world {prob = 10 - world}
+inputHandler (EventKey (SpecialKey KeyDown) Down _ _) world = return world {prob = -10 + prob world}
 inputHandler (EventKey (SpecialKey KeyUp) Down _ _) world = return world {prob = 10 + prob world}
 inputHandler (EventKey (SpecialKey KeyLeft) Down _ _) world = return world {prob = 100}
 inputHandler (EventKey (SpecialKey KeyRight) Down _ _) world = return world {prob = 0}
