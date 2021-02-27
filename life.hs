@@ -80,7 +80,7 @@ drawCell (x0,y0) =  translate (x0*w/x -w/2 +  w/x/2) (-y0*h/y +h/2 -h/y/2) squar
 square = rectangleSolid (w/x) (h/y)
 
 inputHandler :: Event -> World -> IO World
-inputHandler (EventKey (SpecialKey KeyDown) Down _ _) world = return world {prob = 0 + prob world}
+inputHandler (EventKey (SpecialKey KeyDown) Down _ _) world = return world {prob = 10 - world}
 inputHandler (EventKey (SpecialKey KeyUp) Down _ _) world = return world {prob = 10 + prob world}
 inputHandler (EventKey (SpecialKey KeyLeft) Down _ _) world = return world {prob = 100}
 inputHandler (EventKey (SpecialKey KeyRight) Down _ _) world = return world {prob = 0}
