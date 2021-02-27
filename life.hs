@@ -3,6 +3,7 @@ import Graphics.Gloss.Interface.Pure.Animate
 import Graphics.Gloss.Data.ViewPort
 import Graphics.Gloss.Interface.IO.Game
 import Graphics.Gloss.Interface.Pure.Game
+import System.Exit
 
 import Life_backend
 
@@ -69,7 +70,7 @@ initialWorld = Game
     aliveCells = state1, -- TODO add user input
     prob = 100,
     time = 0.0,
-    fps = 1 }
+    fps = 10 }
 
 main :: IO ()
 main = playIO
@@ -116,6 +117,7 @@ inputHandler (EventKey (Char '2') Down _ _) world = return world {aliveCells = s
 inputHandler (EventKey (Char '3') Down _ _) world = return world {aliveCells = state3}
 inputHandler (EventKey (Char '4') Down _ _) world = return world {aliveCells = state4}
 inputHandler (EventKey (Char '5') Down _ _) world = return world {aliveCells = state5}
+inputHandler (EventKey (SpecialKey KeyEsc) Down _ _) world = exitSuccess 
 inputHandler _ w = return w
 
 
